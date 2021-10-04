@@ -8,20 +8,59 @@ import sounddevice as sd
 import vosk
 import sys
 import ast
-import date
+import psutil
+import requests
+import importlib
+import time
+
+import date 
+import use_vlc
 import speak
+import list_apps
+import sortFile
+import general
+
+json_data_files = {
+    'paths': 'path.json'
+}
+
+shutdown_command = [
+    'system shutdown',
+    'system shut down'
+]
+
+update_list = {
+    'files': sortFile.activate,
+    'apps': list_apps.update_path
+}
 
 command_list = {
-    "start movie": r'"C:\Users\admin\Desktop\Media\Anime\Sonny Boy\EP.1.v0.720p.mp4"',
-    "start media": 'vlc',
-    "organize folder": r'C:\Users\admin\Desktop\Projects\Programming\Python Projects\Directory_Organizer\sortFile.py'
+    'start sonny boy': r'C:\Users\admin\Desktop\Media\Playlist\Sonny Boy.xspf',
+    'start media': 'vlc',
+    'organize folder': r'sortFile.py'
+}
+
+media_command_list = {
+    'switch': 'toggle',
+    'change': 'toggle',
+    'screen': 'screen',
+    'mute': 'mute',
+    'silent': 'mute',
+    'silence': 'mute',
+    'volume': 'volume',
+    'sound': 'volume',
+    'audio': 'volume',
+    'next': 'next',
+    'back': 'back'
 }
 
 system_list = {
-    "date": date.convert_date_to_text(),
-    "time": time.convert_time_to_text(),
+    'date': date.convert_date_to_text,
+    'time': date.convert_time_to_text,
+    'update link': sortFile.manage_json_file
 }
 
+# Checks if application is running
 q = queue.Queue()
 
 def int_or_str(text):
@@ -95,8 +134,12 @@ try:
                 if rec.AcceptWaveform(data):
                     raw_data = rec.Result()
                     command = ast.literal_eval(raw_data)['text']
-                    keyword = re.compile('system').findall(command)
-                    print(command)
+                    system = general.find('system', command)
+                    update = general.find('update', command)
+                    media_status = "vlc.exe" in (p.name() for p in psutil.process_iter())
+
+
+                    print(f'[*] Command: {command}')
 
                     for i in command_list.keys():
                         try:
@@ -106,9 +149,17 @@ try:
                                 os.startfile(command_list[i])
                                 break
                             elif "open" in command:
-                                os.system(command.replace("open", "start"))
-                                
-                            elif command == "system stop":
+                                apps = list_apps.read_data_file()
+
+                                for key in apps:
+                                    word = re.compile(key).findall(command)
+                                         
+                                    if word:
+                                        os.startfile(apps[word[0]])
+                                        break
+                                break
+
+                            elif command == shutdown_command[0] or command == shutdown_command[1]:
                                 print("\n\n[!] System shutting down")
                                 parser.exit(0)
                             else:
@@ -118,14 +169,31 @@ try:
                             print(err)
                             continue
 
-                    if keyword:
-                        for i in system_list.keys():
+                    # Controls for System commands/commands relate to application or other features
+                    if system:
+                        general.run_speech_feedback_command(system_list, command)
+                    
+                    if update:
+                        general.run_speech_feedback_command(update_list, command)
+
+                    # Controls for VLC Media player
+                    if media_status:
+                        importlib.reload(use_vlc)
+
+                        for i in media_command_list.keys():
                             try:
                                 word = re.compile(i).findall(command)
                                 if word:
-                                    speak.main(system_list[word[0]])
+                                    if word[0] == 'volume' or word[0] == 'sound' or word[0] == 'audio':
+                                        use_vlc.set_volume_percentage(command)
+                                    elif word[0] == 'back' or word[0] == 'next':
+                                        a = use_vlc.playlist_order(media_command_list[word[0]])
+                                        requests.get(a)
+                                    else:
+                                        use_vlc.command(media_command_list[word[0]])()
+                                
                             except Exception as err:
-                                print(err)
+                                print(use_vlc.start_server())
                                 continue
                 else:
                     raw_data = rec.PartialResult()

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+# Based on the number of the day and month it'll return a string for the pyttsx3 library to convert it to speech.
 def date_text(value):
     switcher = {
         1: 'first',
@@ -10,7 +11,7 @@ def date_text(value):
         6: 'sixth',
         7: 'seventh',
         8: 'eighth',
-        9: 'nineth',
+        9: 'ninth',
         10: 'tenth',
         11: 'eleventh',
         12: 'twelvth',
@@ -24,16 +25,24 @@ def date_text(value):
         20: 'twentieth',
         30: 'thirtieth'
     }
-    return switcher.get(int(value), "Invalid day of week")
+    return switcher.get(int(value), 'Invalid day of week')
 
-def convert_time_to_text():
+# Converts the current time into a string format.
+def convert_time_to_text(*args):
     hour = datetime.now().strftime('%H')
     time_of_day = ''
 
     time_hour = int(datetime.now().strftime('%I'))
     time_min = int(datetime.now().strftime('%M'))
-    time = f'{time_hour} {time_min}'
+    
+    # If the minutes are equal to 0 then it'll remove it from the time string.
+    if time_min == 0:
+        time = f'{time_hour}'
+    else:
+        time = f'{time_hour} {time_min}'
 
+    # This determines the time of day, it uses the hour format.
+    # If it is 1pm the hour format will be 13h.
     if int(hour) > 12:
         time_of_day = 'PM'
     else:
@@ -41,7 +50,8 @@ def convert_time_to_text():
 
     return f"It is, {time} {time_of_day}"
 
-def convert_date_to_text():
+# Converts the current text into a string format.
+def convert_date_to_text(*args):
     day = str(datetime.today().day)
     month = str(datetime.today().month)
     year = datetime.today().year
@@ -49,6 +59,7 @@ def convert_date_to_text():
     data = [day, month]
     date = []
     
+    # Based on the date it'll return the string form of the numbers entered.
     for i in data:
         value = ''
         if int(i) >= 10 and int(i) <= 19:
@@ -64,11 +75,10 @@ def convert_date_to_text():
         date.append(str(value))
     date.append(year)
 
-    return f"Today is the {date[0]} of the {date[1]} of {date[2]}"
+    return f'Today is the {date[0]} of the {date[1]} of {date[2]}'
 
 def main():
-    date = convert_date_to_text()
-    time = convert_time_to_text()
+    pass
     
 
 if __name__ == '__main__':
