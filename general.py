@@ -61,5 +61,32 @@ def run_speech_feedback_command(data={}, command=''):
             data[dict_key[0]]()
             continue
 
+# Method is used to map out a directory and return a dictionary containing
+# a tree displaying parent and child directories. Currently the method can only display 1 parent
+# and all sub directories 1 level deep per a directory found in path passed into parameters
+def map_directory(path):
+    for (root,dirs,files) in os.walk(path):
+        paths = {}
+
+        for name in dirs:
+            dir_path = f"{root}\{name}"
+            dirs_exist = check_dir(dir_path)
+            dir_name = os.path.dirname(f"{root}\{name}").split("\\")[-1]
+            paths[name] = {}
+
+            # If there a are sub directories found it'll map them.
+            if dirs:
+                for i in dirs_exist:
+                    sub_path = f"{root}\{name}\{i}"                
+                    paths[name][i] = sub_path
+             
+        # If no other directories are found takes key value and replace empty dictionary with path to directory.
+        for i in paths:
+            if not paths[i]:
+                paths[i] = f"{root}\{i}"
+
+        # returns the path dictionary
+        return paths
+
 if __name__ == '__main__':
     pass
