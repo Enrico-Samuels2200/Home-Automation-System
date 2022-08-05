@@ -29,9 +29,9 @@ Commands:
 There are current primary and secondary commands. Secondary commands require their primary command first be said.<br>
 
 - Primary Command:
-    Secondary command
+    1. Secondary command
 <br>
-  List of commands:
+  List of commands:<br>
   -----------------
   - Open: The command followed by the application name will open that application. Make sure the command 'update apps' was ran at least once.
 
