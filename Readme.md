@@ -32,7 +32,7 @@ There are current primary and secondary commands. Secondary commands require the
     1. Secondary command
 <br>
   List of commands:<br>
-  -----------------
+  -------------------<br><br>
   - Open: The command followed by the application name will open that application. Make sure the command 'update apps' was ran at least once.
 
   - Update:
